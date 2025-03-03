@@ -19,7 +19,7 @@ KVStore::KVStore(const std::string& filename) : fd(-1), mmap_data(nullptr), mmap
         throw std::runtime_error("Failed to open mmap file.");
     }
 
-    # TODO: not allocate max 
+    // TODO: not allocate max 
     mmap_size = MAX_ITEMS * ITEM_SIZE;
     ftruncate(fd, mmap_size);
 
@@ -38,7 +38,7 @@ KVStore::~KVStore() {
         close(fd);
     }
 }
-# TODO: Add batch write
+// TODO: Add batch write
 void KVStore::add_item(uint32_t key, const std::vector<KVItem>& value) {
     if (key >= MAX_ITEMS) {
         throw std::out_of_range("Key is out of range.");
@@ -64,7 +64,7 @@ void KVStore::save() {
 
 void KVStore::load() {
 }
-# TODO: Add batch search
+// TODO: Add batch search
 std::vector<KVItem> KVStore::search(uint32_t key) {
     if (key >= MAX_ITEMS) {
         throw std::out_of_range("Key is out of range.");
