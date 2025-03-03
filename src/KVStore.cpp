@@ -13,15 +13,18 @@
 
 namespace py = pybind11;
 
-KVStore::KVStore(const std::string& filename) : fd(-1), mmap_data(nullptr), mmap_size(0) {
+KVStore::KVStore(const std::string& filename, size_t num_keys) 
+    : fd(-1), mmap_data(nullptr), mmap_size(num_keys * ITEM_SIZE) {
+    
     fd = open(filename.c_str(), O_RDWR | O_CREAT, 0666);
     if (fd == -1) {
         throw std::runtime_error("Failed to open mmap file.");
     }
 
-    // TODO: not allocate max 
-    mmap_size = MAX_ITEMS * ITEM_SIZE;
-    ftruncate(fd, mmap_size);
+    if (ftruncate(fd, mmap_size) == -1) {
+        close(fd);
+        throw std::runtime_error("Failed to set file size.");
+    }
 
     mmap_data = (uint8_t*) mmap(NULL, mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (mmap_data == MAP_FAILED) {
@@ -29,6 +32,7 @@ KVStore::KVStore(const std::string& filename) : fd(-1), mmap_data(nullptr), mmap
         throw std::runtime_error("Failed to mmap file.");
     }
 }
+
 
 KVStore::~KVStore() {
     if (mmap_data != nullptr) {
@@ -88,7 +92,7 @@ std::vector<KVItem> KVStore::search(uint32_t key) {
 
 PYBIND11_MODULE(KVStoreModule, m) {
     py::class_<KVStore>(m, "KVStore")
-        .def(py::init<const std::string&>())
+    .def(py::init<const std::string&, size_t>(), py::arg("filename"), py::arg("num_keys"))
         .def("add_item", &KVStore::add_item)
         .def("save", &KVStore::save)
         .def("load", &KVStore::load)

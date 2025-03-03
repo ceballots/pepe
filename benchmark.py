@@ -9,10 +9,11 @@ if __name__ == '__main__':
     parser.add_argument("--file", type=str, help="File location", default="data.mmap")
     args = parser.parse_args()
 
-    kv_store = KVStoreModule.KVStore(args.file)
+    kv_store = KVStoreModule.KVStore(args.file, args.n)
     time_limit = 1
     start_time = time.time()
     reads = 0
+
     while time.time() - start_time < time_limit:
         i = random.randint(0, args.n)
         _ = kv_store.search(i)

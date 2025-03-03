@@ -8,7 +8,7 @@ if __name__ == '__main__':
     parser.add_argument("--l", type=int, help="Number of values for each key", default=30)
     args = parser.parse_args()
 
-    kv_store = KVStoreModule.KVStore("data.mmap")
+    kv_store = KVStoreModule.KVStore("data.mmap", args.n)
     for key in range(args.n):
         if key % 100_000 == 0:
             print(f"Writting key {key}")
